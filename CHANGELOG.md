@@ -264,7 +264,7 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
   - Click-to-inspect functionality logs computed styles, backgrounds, and CSS class matches
   - Helps identify text contrast issues and conflicting CSS rules
 
-## [2.2.0] - 2026-11-18
+## [Unreleased]
 
 ### Planned for Phase 2
 
