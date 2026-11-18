@@ -1,3 +1,5 @@
+import { CLEANUP_KINDS, kindSettingKey } from "../utils/combat-cleanup.js";
+
 /**
  * Settings configuration panel
  */
@@ -104,6 +106,26 @@ export class SettingsPanel {
             type: Boolean,
             default: false,
         });
+
+        game.settings.register("chat-trimmer", "combatCleanupEnabled", {
+            name: game.i18n.localize("CHATTRIMMER.Settings.CombatCleanupEnabled"),
+            hint: game.i18n.localize("CHATTRIMMER.Settings.CombatCleanupEnabledHint"),
+            scope: "world",
+            config: true,
+            type: Boolean,
+            default: false,
+        });
+        for (const [kind, enabled] of Object.entries(CLEANUP_KINDS)) {
+            const key = kindSettingKey(kind);
+            game.settings.register("chat-trimmer", key, {
+                name: game.i18n.localize(`CHATTRIMMER.Settings.${key[0].toUpperCase()}${key.slice(1)}`),
+                hint: game.i18n.localize("CHATTRIMMER.Settings.CombatCleanupKindHint"),
+                scope: "world",
+                config: true,
+                type: Boolean,
+                default: enabled,
+            });
+        }
 
         // Compression settings
         game.settings.register("chat-trimmer", "enableCombatCompression", {

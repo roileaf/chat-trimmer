@@ -2,6 +2,12 @@
 
 All notable changes to the Chat Trimmer & Summarizer module will be documented in this file.
 
+## [2.2.0] - 2026-11-18
+
+### Added
+
+- Combat Turn Cleanup: when the combat tracker advances, archive and remove attack rolls, saving throws, damage rolls, and HP change cards older than one full round, keeping spell, ability, and item cards and GM whispers. Each message kind is selectable in settings.
+
 ## [2.1.1] - 2026-10-12
 
 ### Fixed
@@ -258,7 +264,7 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
   - Click-to-inspect functionality logs computed styles, backgrounds, and CSS class matches
   - Helps identify text contrast issues and conflicting CSS rules
 
-## [Unreleased]
+## [2.2.0] - 2026-11-18
 
 ### Planned for Phase 2
 

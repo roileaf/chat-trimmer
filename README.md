@@ -10,6 +10,16 @@
 
 While Chat Trimmer is enabled, Foundry's trash-can **Clear Chat Log** button deletes messages in batches of 10, with 100 ms pauses between batches. This spreads deletion hooks and chat animations over smaller requests to reduce long stalls. Large logs may take longer to finish clearing. The normal confirmation and document permissions apply; messages posted after cleanup starts remain in chat. Clear Chat Log still deletes messages without archiving them.
 
+## Combat turn cleanup
+
+Enable **Combat Turn Cleanup** in module settings to keep chat readable during fights. Each time the combat tracker advances, Chat Trimmer archives and removes the selected kinds of messages that are more than one full round old, so the last full round always stays visible (for unapplied damage buttons or quick reference). Rewinding the tracker clears nothing.
+
+- Default cleared kinds: attack rolls, saving throws, damage rolls, and HP change / damage-taken cards. Skill checks, initiative, and out-of-character chat can be enabled individually.
+- Spell, ability, feat, and item cards (save DCs, ongoing effects) and anything whispered to a GM are always kept.
+- Cleared messages go into the current session archive, so they stay searchable.
+- Works even when **Disable Auto-Trim During Encounters** is on. The final round of a combat is left in chat for normal trimming.
+- Only messages posted after the feature is enabled are cleared. Detection is reliable on PF2e and best effort on other systems.
+
 ## Session controls and archive access
 
 - Right-click the Chat Trimmer button → **Set Current Session Number** to match your campaign's session count. This changes the label without starting a new session.

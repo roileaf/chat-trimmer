@@ -9,6 +9,12 @@ import { SettingsPanel } from "./ui/settings-panel.js";
 import { setCurrentSession, startNextSession } from "./sessions.js";
 import { installChatCleanup } from "./utils/chat-cleanup.js";
 import {
+  buildCombatStamp,
+  getCleanupKinds,
+  isForwardMove,
+  selectForCleanup,
+} from "./utils/combat-cleanup.js";
+import {
   hasActiveCombatEncounter,
   shouldSkipAutoTrim,
 } from "./utils/auto-trim.js";
@@ -300,6 +306,52 @@ Hooks.on("createChatMessage", (message, options, userId) => {
       setTimeout(() => performAutoTrim(), 100);
     }
   }
+});
+
+/**
+ * Combat turn cleanup: stamp each new message with the combat position.
+ * Runs on the author's client before creation, so no extra DB write.
+ */
+Hooks.on("preCreateChatMessage", (message) => {
+  if (!game.settings.get("chat-trimmer", "combatCleanupEnabled")) return;
+  const stamp = buildCombatStamp(game.combat);
+  if (stamp) {
+    message.updateSource({ "flags.chat-trimmer.combatPos": stamp });
+  }
+});
+
+Hooks.on("preUpdateCombat", (combat, changed, options) => {
+  if (!("turn" in changed) && !("round" in changed)) return;
+  options.chatTrimmerPrev = { round: combat.round, turn: combat.turn ?? 0 };
+});
+
+/**
+ * Combat turn cleanup: when the tracker advances, archive + delete
+ * checklist-matching messages more than one full round old.
+ */
+Hooks.on("updateCombat", (combat, changed, options) => {
+  if (!("turn" in changed) && !("round" in changed)) return;
+  if (!game.settings.get("chat-trimmer", "combatCleanupEnabled")) return;
+  if (game.users.activeGM?.id !== game.user.id) return;
+
+  const next = { round: combat.round, turn: combat.turn ?? 0 };
+  if (!isForwardMove(options.chatTrimmerPrev, next)) return;
+
+  const selected = selectForCleanup(
+    game.messages.contents,
+    combat,
+    getCleanupKinds(),
+  ).sort((a, b) => a.timestamp - b.timestamp);
+  if (!selected.length || !chatTrimmer) return;
+
+  console.log(
+    `Chat Trimmer | Combat turn cleanup: clearing ${selected.length} messages`,
+  );
+  chatTrimmer
+    .trim(selected, { ignoreKeep: true, silent: true })
+    .catch((error) =>
+      console.error("Chat Trimmer | Combat turn cleanup failed:", error),
+    );
 });
 
 /**

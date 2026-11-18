@@ -86,14 +86,15 @@ export class ChatTrimmer {
         const messageIds = messages.map((m) => m.id);
         await ChatMessage.deleteDocuments(messageIds);
 
-        ui.notifications.info(
-          game.i18n.format(
-            "CHATTRIMMER.Notifications.TrimmingCompleteNoArchive",
-            {
-              original: messages.length,
-            },
-          ),
-        );
+        if (!options.silent)
+          ui.notifications.info(
+            game.i18n.format(
+              "CHATTRIMMER.Notifications.TrimmingCompleteNoArchive",
+              {
+                original: messages.length,
+              },
+            ),
+          );
 
         return {
           archive: null,
@@ -180,11 +181,12 @@ export class ChatTrimmer {
         ((messages.length - entries.length) / messages.length) * 100,
       );
 
-      ui.notifications.info(
-        game.i18n.format("CHATTRIMMER.Notifications.TrimmingComplete", {
-          original: messages.length,
-        }),
-      );
+      if (!options.silent)
+        ui.notifications.info(
+          game.i18n.format("CHATTRIMMER.Notifications.TrimmingComplete", {
+            original: messages.length,
+          }),
+        );
 
       return {
         archive,
