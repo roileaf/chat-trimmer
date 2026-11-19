@@ -1,3 +1,4 @@
+import { CLOCK_SETTING, LIFETIME_TYPES, lifetimeSettingKey } from "../utils/message-lifetimes.js";
 import { CLEANUP_KINDS, kindSettingKey } from "../utils/combat-cleanup.js";
 
 /**
@@ -126,6 +127,33 @@ export class SettingsPanel {
                 default: enabled,
             });
         }
+
+        game.settings.register("chat-trimmer", "lifetimesEnabled", {
+            name: game.i18n.localize("CHATTRIMMER.Settings.LifetimesEnabled"),
+            hint: game.i18n.localize("CHATTRIMMER.Settings.LifetimesEnabledHint"),
+            scope: "world",
+            config: true,
+            type: Boolean,
+            default: false,
+        });
+        for (const [type, minutes] of Object.entries(LIFETIME_TYPES)) {
+            const key = lifetimeSettingKey(type);
+            game.settings.register("chat-trimmer", key, {
+                name: game.i18n.localize(`CHATTRIMMER.Settings.${key[0].toUpperCase()}${key.slice(1)}`),
+                hint: game.i18n.localize("CHATTRIMMER.Settings.LifetimeHint"),
+                scope: "world",
+                config: true,
+                type: Number,
+                default: minutes,
+                range: { min: 0, max: 240, step: 5 },
+            });
+        }
+        game.settings.register("chat-trimmer", CLOCK_SETTING, {
+            scope: "world",
+            config: false,
+            type: Number,
+            default: 0,
+        });
 
         // Compression settings
         game.settings.register("chat-trimmer", "enableCombatCompression", {

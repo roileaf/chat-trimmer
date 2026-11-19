@@ -15,6 +15,11 @@ import {
   selectForCleanup,
 } from "./utils/combat-cleanup.js";
 import {
+  CLOCK_SETTING,
+  getLifetimes,
+  selectExpired,
+} from "./utils/message-lifetimes.js";
+import {
   hasActiveCombatEncounter,
   shouldSkipAutoTrim,
 } from "./utils/auto-trim.js";
@@ -71,6 +76,13 @@ Hooks.once("ready", async () => {
   // Setup periodic auto-trim check
   const timeThreshold = game.settings.get("chat-trimmer", "timeThreshold");
   setInterval(checkAutoTrim, timeThreshold * 60 * 60 * 1000); // Convert hours to ms
+
+  // Message lifetimes world clock (1 tick per running minute)
+  setInterval(() => {
+    tickMessageLifetimes().catch((error) =>
+      console.error("Chat Trimmer | Message lifetimes failed:", error),
+    );
+  }, 60 * 1000);
 });
 
 /**
@@ -313,12 +325,45 @@ Hooks.on("createChatMessage", (message, options, userId) => {
  * Runs on the author's client before creation, so no extra DB write.
  */
 Hooks.on("preCreateChatMessage", (message) => {
-  if (!game.settings.get("chat-trimmer", "combatCleanupEnabled")) return;
-  const stamp = buildCombatStamp(game.combat);
-  if (stamp) {
-    message.updateSource({ "flags.chat-trimmer.combatPos": stamp });
+  const update = {};
+  if (game.settings.get("chat-trimmer", "combatCleanupEnabled")) {
+    const stamp = buildCombatStamp(game.combat);
+    if (stamp) update["flags.chat-trimmer.combatPos"] = stamp;
   }
+  if (game.settings.get("chat-trimmer", "lifetimesEnabled")) {
+    update["flags.chat-trimmer.clock"] =
+      Number(game.settings.get("chat-trimmer", CLOCK_SETTING)) || 0;
+  }
+  if (Object.keys(update).length) message.updateSource(update);
 });
+
+/**
+ * Message lifetimes: advance the world clock once a minute (active GM only,
+ * skipping paused minutes when configured), then clear expired messages.
+ */
+async function tickMessageLifetimes() {
+  if (!game.settings.get("chat-trimmer", "lifetimesEnabled")) return;
+  if (game.users.activeGM?.id !== game.user.id) return;
+  if (game.paused && game.settings.get("chat-trimmer", "pauseTimerWithGame")) {
+    return;
+  }
+
+  const clock =
+    (Number(game.settings.get("chat-trimmer", CLOCK_SETTING)) || 0) + 1;
+  await game.settings.set("chat-trimmer", CLOCK_SETTING, clock);
+
+  const expired = selectExpired(
+    game.messages.contents,
+    clock,
+    getLifetimes(),
+  ).sort((a, b) => a.timestamp - b.timestamp);
+  if (!expired.length || !chatTrimmer) return;
+
+  console.log(
+    `Chat Trimmer | Message lifetimes: clearing ${expired.length} messages`,
+  );
+  await chatTrimmer.trim(expired, { ignoreKeep: true, silent: true });
+}
 
 Hooks.on("preUpdateCombat", (combat, changed, options) => {
   if (!("turn" in changed) && !("round" in changed)) return;

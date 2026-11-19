@@ -20,6 +20,24 @@ Enable **Combat Turn Cleanup** in module settings to keep chat readable during f
 - Works even when **Disable Auto-Trim During Encounters** is on. The final round of a combat is left in chat for normal trimming.
 - Only messages posted after the feature is enabled are cleared. Detection is reliable on PF2e and best effort on other systems.
 
+## Message lifetimes
+
+Enable **Message Lifetimes** in module settings to give each kind of message its own lifetime in minutes. Once a message is older than its lifetime, Chat Trimmer archives and removes it. Set a lifetime to 0 to keep that kind forever.
+
+| Type                         | Default |
+| ---------------------------- | ------- |
+| Whispers                     | 0       |
+| GM messages                  | 0       |
+| Spell, ability & item cards  | 0       |
+| Combat rolls                 | 0       |
+| Other rolls                  | 0       |
+| In-character speech & emotes | 0       |
+| Player out-of-character chat | 15      |
+
+- Time only counts while the world is running with a GM connected, so last session's chatter is not cleared the moment you load the world. With **Pause Timer With Game** on, paused time does not count either.
+- The first matching type applies, in the order above (a GM's spell card uses the GM lifetime).
+- Cleared messages go into the current session archive. Only messages posted after enabling are affected.
+
 ## Session controls and archive access
 
 - Right-click the Chat Trimmer button → **Set Current Session Number** to match your campaign's session count. This changes the label without starting a new session.

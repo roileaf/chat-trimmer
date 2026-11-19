@@ -67,8 +67,17 @@ export function isForwardMove(prev, next) {
   return next.turn > prev.turn;
 }
 
-function isRollMessage(msg) {
+export function isRollMessage(msg) {
   return Boolean(msg.isRoll || msg.rolls?.length);
+}
+
+function hasItemOrigin(flags) {
+  return Boolean(flags.pf2e?.origin || flags.dnd5e?.use || flags.dnd5e?.item);
+}
+
+/** Spell/ability/feat/item card without a roll context (save DCs, effects). */
+export function isReferenceCard(msg) {
+  return hasItemOrigin(msg.flags ?? {}) && classifyCleanupKind(msg) === null;
 }
 
 /**
@@ -94,7 +103,7 @@ export function classifyCleanupKind(msg) {
   }
 
   // Anything carrying an item origin without a roll context is a reference card.
-  if (flags.pf2e?.origin || flags.dnd5e?.use || flags.dnd5e?.item) return null;
+  if (hasItemOrigin(flags)) return null;
 
   if (isRollMessage(msg)) {
     const content = String(msg.content ?? "").toLowerCase();
