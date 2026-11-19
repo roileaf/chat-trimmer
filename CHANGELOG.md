@@ -10,6 +10,8 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
 - Progress bar for Trim All, new-session archiving, and auto-trim: shows analyzing, saving, and a live count while messages are removed.
 - Campaign Stats: a chart button in the archive viewer opens per-character leaderboards (rolls, nat 20s, nat 1s, crits, damage dealt) for the whole campaign or one session, with highlights and rolls-per-session bars. GM and NPC rolls are grouped into one row. Exact for sessions archived from this version on; older sessions are marked partial.
 - Skill Check Clustering: checks of the same skill rolled within 2 minutes of each other (for example, everyone rolling Perception) are archived as one entry such as "Perception ×4 — Valeros 25 ✓✓, Kyra 21 ✓, …", expandable to each roll. On by default; toggle in settings.
+- Dialogue Threads: runs of in-character speech and emotes (3+ lines, each within 5 minutes) are archived as one conversation entry listing the speakers, expandable to each line. Rolls break a thread; OOC chat does not. On by default.
+- NPC Tracking: session summaries list the NPCs met (lines spoken, first appearance), conversations are tagged and searchable by NPC, and the archive viewer has an NPC filter. NPCs are speakers whose actor has no player owner, or the GM speaking under a token alias.
 
 ### Changed
 

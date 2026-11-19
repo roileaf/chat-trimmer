@@ -1,4 +1,5 @@
 import { computeActorStats, mergeActorStats } from "./utils/actor-stats.js";
+import { collectNpcs } from "./algorithms/dialogue-threads.js";
 
 /**
  * Archive manager for creating and managing chat archives
@@ -1057,6 +1058,7 @@ export class ArchiveManager {
         day: "numeric",
       }),
       participants: Array.from(participants),
+      npcsMet: collectNpcs(entries),
       totalMessages:
         archive.getFlag("chat-trimmer", "originalMessageCount") || 0,
       totalEntries: entries.length,

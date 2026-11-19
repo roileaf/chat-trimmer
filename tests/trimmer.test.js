@@ -131,3 +131,55 @@ describe("ChatTrimmer.createArchiveEntries skill clusters", () => {
     expect(entries.map((e) => e.type)).toEqual(["individual", "individual"]);
   });
 });
+
+describe("ChatTrimmer.createArchiveEntries conversations", () => {
+  const say = (id, alias, timestamp, actor) => ({
+    id,
+    alias,
+    timestamp,
+    speaker: { alias, actor },
+    author: { isGM: false },
+    style: CONST.CHAT_MESSAGE_STYLES.IC,
+    content: `<p>${alias} speaks</p>`,
+    whisper: [],
+    rolls: [],
+    flags: {},
+    toObject() {
+      return { id, content: this.content, timestamp, speaker: this.speaker };
+    },
+  });
+
+  test("turns a run of IC lines into a tagged conversation entry", () => {
+    game.settings.get = jest.fn((mod, key) =>
+      key === "enableDialogueCompression" ? true : 0,
+    );
+    game.actors = {
+      get: (id) =>
+        id === "hem" ? { name: "Mayor Hemlock", hasPlayerOwner: false } : null,
+      getName: () => null,
+    };
+    const trimmer = new ChatTrimmer();
+    const lines = [
+      say("a", "Valeros", 0),
+      say("b", "Hemlock", 60_000, "hem"),
+      say("c", "Valeros", 120_000),
+    ];
+    const entries = trimmer.createArchiveEntries(
+      { combats: [] },
+      { critical: [], all: lines },
+    );
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      type: "cluster",
+      clusterKind: "dialogue",
+      categories: ["speech"],
+      npcs: ["Mayor Hemlock"],
+      memberTexts: [
+        "Valeros: Valeros speaks",
+        "Hemlock: Hemlock speaks",
+        "Valeros: Valeros speaks",
+      ],
+    });
+    expect(entries[0].searchKeywords).toContain("mayor hemlock");
+  });
+});

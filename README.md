@@ -48,6 +48,12 @@ Click the chart button in the archive viewer to open **Campaign Stats**: per-cha
 
 When chat is trimmed, checks of the same skill rolled within 2 minutes of each other become one archive entry, for example **Perception ×4 — Valeros 25 ✓✓, Kyra 21 ✓, Ezren 12 ✗, Merisiel 9 ✗✗**. Expand it to see each roll and open the original. Degree-of-success marks appear when PF2e reports them. Skill names come from PF2e roll tags, dnd5e skill IDs, or the roll title on other systems. Checks inside combat summaries or kept as key moments are left as they are. Toggle with **Enable Skill Check Clustering**.
 
+## Dialogue threads and NPCs
+
+When chat is trimmed, a run of in-character speech and emotes (at least 3 lines, each within 5 minutes of the last) becomes one conversation entry, for example **Conversation — Valeros, Mayor Hemlock, Kyra (14 lines)**. Expand it to read each line. Rolls end a conversation; out-of-character chat does not. Toggle with **Enable Dialogue Compression**.
+
+NPCs are speakers whose actor has no player owner, or the GM speaking under a token alias. Session summaries list **NPCs met** with how many lines each spoke and when they first appeared, conversations are searchable by NPC name, and the archive viewer has an **NPC** filter.
+
 ## Session controls and archive access
 
 - Right-click the Chat Trimmer button → **Set Current Session Number** to match your campaign's session count. This changes the label without starting a new session.

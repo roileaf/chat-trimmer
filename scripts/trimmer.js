@@ -10,6 +10,12 @@ import {
   formatClusterSummary,
   formatMemberText,
 } from "./algorithms/skill-cluster.js";
+import {
+  findDialogueThreads,
+  formatThreadSummary,
+  getNpcName,
+  lineText,
+} from "./algorithms/dialogue-threads.js";
 
 /**
  * Main chat trimmer class
@@ -658,6 +664,51 @@ export class ChatTrimmer {
           isKeyEvent: false,
         });
         cluster.messages.forEach((m) => processedMessageIds.add(m.id));
+      }
+    }
+
+    // Group runs of in-character speech into conversation entries
+    if (game.settings.get("chat-trimmer", "enableDialogueCompression")) {
+      const threads = findDialogueThreads(classified.all || [], {
+        isAvailable: (msg) => !processedMessageIds.has(msg.id),
+      });
+      for (const thread of threads) {
+        const summary = formatThreadSummary(thread);
+        const npcs = [
+          ...new Set(thread.messages.map(getNpcName).filter(Boolean)),
+        ];
+        const hasEmotes = thread.messages.some(
+          (m) =>
+            (m.style ?? m.type) ===
+            (CONST.CHAT_MESSAGE_STYLES || CONST.CHAT_MESSAGE_TYPES).EMOTE,
+        );
+        entries.push({
+          id: foundry.utils.randomID(),
+          type: "cluster",
+          clusterKind: "dialogue",
+          category: "speech",
+          categories: hasEmotes ? ["speech", "emotes"] : ["speech"],
+          icon: "💬",
+          timestamp: thread.messages[0].timestamp,
+          speaker: "",
+          displayText: summary,
+          displaySummary: summary,
+          content: thread.messages.map(lineText).join("\n"),
+          originalMessages: thread.messages.map((m) => m.toObject()),
+          memberTexts: thread.messages.map(lineText),
+          npcs,
+          searchKeywords: [
+            ...new Set([
+              ...npcs.map((name) => name.toLowerCase()),
+              ...thread.messages.flatMap((m) =>
+                MessageParser.extractKeywords(m.content),
+              ),
+            ]),
+          ],
+          originalMessageIds: thread.messages.map((m) => m.id),
+          isKeyEvent: false,
+        });
+        thread.messages.forEach((m) => processedMessageIds.add(m.id));
       }
     }
 

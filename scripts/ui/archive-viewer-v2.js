@@ -4,6 +4,7 @@
  */
 import { MessageViewerDialog } from "./dialogs.js";
 import { CampaignStatsApp } from "./campaign-stats.js";
+import { collectNpcs, entryNpcs } from "../algorithms/dialogue-threads.js";
 import { MessageParser } from "../utils/message-parser.js";
 
 export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicationMixin(
@@ -14,6 +15,7 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
     this.archiveManager = archiveManager;
     this.currentSession = null; // Will default to most recent archive
     this.currentFilter = "all";
+    this.npcFilter = ""; // NPC name, or "" for all
     this.searchQuery = "";
     this.expandedEntries = new Set();
     this.summaryCollapsed = false; // Track session summary collapsed state
@@ -166,6 +168,14 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
       });
     }
 
+    this.element
+      .querySelector(".npc-filter")
+      ?.addEventListener("change", (e) => {
+        this.npcFilter = e.target.value;
+        this.currentPage = 1;
+        this.render();
+      });
+
     if (searchInput) {
       // Update state immediately to prevent data loss on other renders
       searchInput.addEventListener("input", (e) => {
@@ -315,6 +325,18 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
       console.log(
         `Archive Viewer | After category filter '${this.currentFilter}': ${entries.length} entries`,
       );
+    }
+
+    // NPC filter (options come from the unfiltered session entries)
+    const npcOptions = collectNpcs(unfilteredEntries).map((npc) => ({
+      name: npc.name,
+      selected: npc.name === this.npcFilter,
+    }));
+    if (this.npcFilter && !npcOptions.some((o) => o.selected)) {
+      this.npcFilter = "";
+    }
+    if (this.npcFilter) {
+      entries = entries.filter((e) => entryNpcs(e).includes(this.npcFilter));
     }
 
     // Apply search
@@ -525,6 +547,8 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
       currentArchive,
       currentSession: this.currentSession,
       currentFilter: this.currentFilter,
+      npcFilter: this.npcFilter,
+      npcOptions,
       searchQuery: this.searchQuery,
       filteredEntries: paginatedEntries,
       totalFilteredEntries,

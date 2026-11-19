@@ -176,7 +176,7 @@ export class SettingsPanel {
                 "CHATTRIMMER.Settings.EnableDialogueCompressionHint",
             ),
             scope: "world",
-            config: false, // Hidden until dialogue detection is implemented
+            config: true,
             type: Boolean,
             default: true,
         });

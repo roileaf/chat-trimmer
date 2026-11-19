@@ -52,6 +52,16 @@
                         {{/each}}
                     </ul>
                 </div>
+                {{#if sessionSummary.npcsMet.length}}
+                <div class="summary-section npcs-met">
+                    <h4>{{localize "CHATTRIMMER.ArchiveViewer.NpcsMet"}}</h4>
+                    <ul>
+                        {{#each sessionSummary.npcsMet}}
+                        <li><strong>{{this.name}}</strong> · {{this.lines}} {{localize "CHATTRIMMER.ArchiveViewer.NpcLines"}} · {{formatTime this.firstSeen}}</li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{/if}}
                 <div class="summary-section">
                     <h4>Statistics</h4>
                     <ul>
@@ -119,6 +129,18 @@
                     </option>
                 </select>
             </div>
+
+            {{#if npcOptions.length}}
+            <div class="filter-group">
+                <label>{{localize "CHATTRIMMER.ArchiveViewer.NpcFilter"}}:</label>
+                <select class="npc-filter" name="npc">
+                    <option value="" {{#unless npcFilter}}selected{{/unless}}>{{localize "CHATTRIMMER.ArchiveViewer.AllNpcs"}}</option>
+                    {{#each npcOptions}}
+                    <option value="{{this.name}}" {{#if this.selected}}selected{{/if}}>{{this.name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            {{/if}}
 
             <div class="search-group">
                 <input
