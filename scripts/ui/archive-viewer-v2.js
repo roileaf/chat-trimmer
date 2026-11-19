@@ -406,7 +406,7 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
             id: `${e.id}-sub-${idx}`,
             parentId: e.id,
             originalMessage: originalMsg,
-            displayText: preview,
+            displayText: e.memberTexts?.[idx] || preview,
             timestamp: originalMsg.timestamp,
             isSubEntry: true,
           };

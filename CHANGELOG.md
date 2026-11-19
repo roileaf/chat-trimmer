@@ -9,6 +9,7 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
 - Message Lifetimes: give each message type (player OOC chat, IC speech, rolls, combat rolls, spell/ability cards, GM messages, whispers) its own lifetime in minutes. Expired messages are archived and removed. Time only counts while the world is running; player OOC chat defaults to 15 minutes, everything else is kept.
 - Progress bar for Trim All, new-session archiving, and auto-trim: shows analyzing, saving, and a live count while messages are removed.
 - Campaign Stats: a chart button in the archive viewer opens per-character leaderboards (rolls, nat 20s, nat 1s, crits, damage dealt) for the whole campaign or one session, with highlights and rolls-per-session bars. GM and NPC rolls are grouped into one row. Exact for sessions archived from this version on; older sessions are marked partial.
+- Skill Check Clustering: checks of the same skill rolled within 2 minutes of each other (for example, everyone rolling Perception) are archived as one entry such as "Perception ×4 — Valeros 25 ✓✓, Kyra 21 ✓, …", expandable to each roll. On by default; toggle in settings.
 
 ### Changed
 

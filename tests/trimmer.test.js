@@ -78,3 +78,56 @@ describe("ChatTrimmer.trim progress", () => {
     expect(ChatMessage.deleteDocuments).toHaveBeenCalledWith(["a"]);
   });
 });
+
+describe("ChatTrimmer.createArchiveEntries skill clusters", () => {
+  const check = (id, alias, total, timestamp) => ({
+    id,
+    alias,
+    timestamp,
+    content: String(total),
+    flavor: "",
+    whisper: [],
+    rolls: [{ total }],
+    speaker: { alias },
+    flags: { pf2e: { context: { type: "perception-check" } } },
+    toObject() {
+      return { id, content: this.content, timestamp };
+    },
+  });
+
+  test("groups same-skill checks into one cluster entry", () => {
+    game.settings.get = jest.fn((mod, key) =>
+      key === "enableSkillCheckClustering" ? true : 0,
+    );
+    const trimmer = new ChatTrimmer();
+    const a = check("a", "Valeros", 25, 0);
+    const b = check("b", "Ezren", 12, 30_000);
+    const entries = trimmer.createArchiveEntries(
+      { combats: [] },
+      { critical: [], all: [a, b] },
+    );
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      type: "cluster",
+      displayText: "🎲 Perception ×2 — Valeros 25, Ezren 12",
+      memberTexts: ["Valeros 25", "Ezren 12"],
+      originalMessageIds: ["a", "b"],
+    });
+  });
+
+  test("clustering off leaves checks individual", () => {
+    game.settings.get = jest.fn(() => 0);
+    const trimmer = new ChatTrimmer();
+    jest.spyOn(trimmer, "formatIndividualDisplay").mockReturnValue("x");
+    jest
+      .spyOn(trimmer, "determineMessageCategories")
+      .mockReturnValue(["rolls"]);
+    jest.spyOn(trimmer, "extractRollData").mockReturnValue(null);
+    jest.spyOn(trimmer, "isKeyEvent").mockReturnValue(false);
+    const entries = trimmer.createArchiveEntries(
+      { combats: [] },
+      { critical: [], all: [check("a", "V", 1, 0), check("b", "E", 2, 1)] },
+    );
+    expect(entries.map((e) => e.type)).toEqual(["individual", "individual"]);
+  });
+});

@@ -5,6 +5,11 @@ import { MessageParser } from "./utils/message-parser.js";
 import { deleteInBatches } from "./utils/chat-cleanup.js";
 import { createProgress } from "./utils/progress.js";
 import { computeActorStats } from "./utils/actor-stats.js";
+import {
+  findSkillClusters,
+  formatClusterSummary,
+  formatMemberText,
+} from "./algorithms/skill-cluster.js";
 
 /**
  * Main chat trimmer class
@@ -618,6 +623,41 @@ export class ChatTrimmer {
         });
 
         processedMessageIds.add(msg.id);
+      }
+    }
+
+    // Group same-skill checks rolled close together into cluster entries
+    if (game.settings.get("chat-trimmer", "enableSkillCheckClustering")) {
+      const candidates = (classified.all || []).filter(
+        (msg) => !processedMessageIds.has(msg.id),
+      );
+      for (const cluster of findSkillClusters(candidates)) {
+        const summary = formatClusterSummary(cluster);
+        entries.push({
+          id: foundry.utils.randomID(),
+          type: "cluster",
+          category: "rolls",
+          categories: ["rolls"],
+          icon: "🎲",
+          timestamp: cluster.messages[0].timestamp,
+          speaker: "",
+          displayText: summary,
+          displaySummary: summary,
+          content: summary,
+          originalMessages: cluster.messages.map((m) => m.toObject()),
+          memberTexts: cluster.messages.map(formatMemberText),
+          searchKeywords: [
+            ...new Set([
+              cluster.skill.toLowerCase(),
+              ...cluster.messages.flatMap((m) =>
+                MessageParser.extractKeywords(m.content),
+              ),
+            ]),
+          ],
+          originalMessageIds: cluster.messages.map((m) => m.id),
+          isKeyEvent: false,
+        });
+        cluster.messages.forEach((m) => processedMessageIds.add(m.id));
       }
     }
 

@@ -44,6 +44,10 @@ Enable **Message Lifetimes** in module settings to give each kind of message its
 
 Click the chart button in the archive viewer to open **Campaign Stats**: per-character rolls, nat 20s, nat 1s, critical successes and failures, and damage dealt, for the whole campaign or a single session. Highlights show the most nat 20s, most nat 1s, and the biggest hit; the campaign view also shows rolls per session. Rolls by the GM or non-player actors are grouped into one **GM / NPCs** row. Stats are counted from the original dice when chat is trimmed, so they are exact from this version on; sessions archived earlier are marked partial. Players can open it unless **Hide archives from players** is on.
 
+## Skill check clustering
+
+When chat is trimmed, checks of the same skill rolled within 2 minutes of each other become one archive entry, for example **Perception ×4 — Valeros 25 ✓✓, Kyra 21 ✓, Ezren 12 ✗, Merisiel 9 ✗✗**. Expand it to see each roll and open the original. Degree-of-success marks appear when PF2e reports them. Skill names come from PF2e roll tags, dnd5e skill IDs, or the roll title on other systems. Checks inside combat summaries or kept as key moments are left as they are. Toggle with **Enable Skill Check Clustering**.
+
 ## Session controls and archive access
 
 - Right-click the Chat Trimmer button → **Set Current Session Number** to match your campaign's session count. This changes the label without starting a new session.

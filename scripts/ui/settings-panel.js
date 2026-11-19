@@ -189,7 +189,7 @@ export class SettingsPanel {
                 "CHATTRIMMER.Settings.EnableSkillCheckClusteringHint",
             ),
             scope: "world",
-            config: false, // Hidden until skill check clustering is implemented
+            config: true,
             type: Boolean,
             default: true,
         });

@@ -43,7 +43,7 @@
   "CHATTRIMMER.Settings.EnableDialogueCompression": "Enable Dialogue Compression",
   "CHATTRIMMER.Settings.EnableDialogueCompressionHint": "Compress dialogue threads into summaries",
   "CHATTRIMMER.Settings.EnableSkillCheckClustering": "Enable Skill Check Clustering",
-  "CHATTRIMMER.Settings.EnableSkillCheckClusteringHint": "Group related skill checks together",
+  "CHATTRIMMER.Settings.EnableSkillCheckClusteringHint": "When trimming, group checks of the same skill rolled within 2 minutes of each other (for example, everyone rolling Perception) into one archive entry. Expand it to see each roll.",
   "CHATTRIMMER.Settings.Use24hTime": "Use 24-Hour Time Format",
   "CHATTRIMMER.Settings.Use24hTimeHint": "Display timestamps in 24-hour format (e.g. 14:30 instead of 2:30 PM)",
   "CHATTRIMMER.Settings.StorageType": "Storage Location",
