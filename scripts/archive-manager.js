@@ -1,3 +1,5 @@
+import { computeActorStats, mergeActorStats } from "./utils/actor-stats.js";
+
 /**
  * Archive manager for creating and managing chat archives
  */
@@ -295,6 +297,12 @@ export class ArchiveManager {
         (existingStats.itemsTransferred || 0) +
         (data.stats?.itemsTransferred || 0),
       xpAwarded: (existingStats.xpAwarded || 0) + (data.stats?.xpAwarded || 0),
+      byActor: mergeActorStats(existingStats.byActor, data.stats?.byActor),
+      // Existing content from before per-character tracking: stats are incomplete.
+      byActorPartial: Boolean(
+        existingStats.byActorPartial ||
+        (existingOriginalCount > 0 && !existingStats.byActor),
+      ),
     };
 
     // Merge search index
@@ -1080,6 +1088,47 @@ export class ArchiveManager {
     }
 
     return maxSession + 1;
+  }
+
+  /**
+   * Per-session stats for the campaign stats dashboard, one item per session
+   * number (segments merged). Archives saved before per-character tracking
+   * fall back to their individual entries and are marked partial.
+   * @returns {Promise<Array<{number, name, byActor, partial, originalCount, compressedCount}>>}
+   */
+  async getSessionStats() {
+    const sessions = new Map();
+    for (const archive of await this.getAllArchives()) {
+      const number = archive.getFlag("chat-trimmer", "sessionNumber") ?? 0;
+      const stats = archive.getFlag("chat-trimmer", "statistics") || {};
+      let byActor = stats.byActor;
+      let partial = Boolean(stats.byActorPartial);
+      if (!byActor) {
+        const entries = await this.getArchiveEntries(archive).catch(() => []);
+        byActor = computeActorStats(
+          entries.map((e) => e.originalMessage).filter(Boolean),
+        );
+        partial = true;
+      }
+
+      const session = sessions.get(number) ?? {
+        number,
+        name:
+          archive.getFlag("chat-trimmer", "sessionName") || `Session ${number}`,
+        byActor: {},
+        partial: false,
+        originalCount: 0,
+        compressedCount: 0,
+      };
+      session.byActor = mergeActorStats(session.byActor, byActor);
+      session.partial ||= partial;
+      session.originalCount +=
+        archive.getFlag("chat-trimmer", "originalMessageCount") || 0;
+      session.compressedCount +=
+        archive.getFlag("chat-trimmer", "compressedEntryCount") || 0;
+      sessions.set(number, session);
+    }
+    return [...sessions.values()].sort((a, b) => a.number - b.number);
   }
 
   /**

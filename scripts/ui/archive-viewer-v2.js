@@ -3,6 +3,7 @@
  * Modern Foundry ApplicationV2 implementation
  */
 import { MessageViewerDialog } from "./dialogs.js";
+import { CampaignStatsApp } from "./campaign-stats.js";
 import { MessageParser } from "../utils/message-parser.js";
 
 export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicationMixin(
@@ -46,6 +47,7 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
       toggleEntry: ArchiveViewerV2.prototype.onToggleEntry,
       toggleSummary: ArchiveViewerV2.prototype.onToggleSummary,
       toggleViewMode: ArchiveViewerV2.prototype.onToggleViewMode,
+      openStats: ArchiveViewerV2.prototype.onOpenStats,
       viewOriginal: ArchiveViewerV2.prototype.onViewOriginal,
       viewKeyEvent: ArchiveViewerV2.prototype.onViewKeyEvent,
       rollButton: ArchiveViewerV2.prototype.onRollButton,
@@ -568,6 +570,12 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
     this.summaryCollapsed = !this.summaryCollapsed;
     this._preserveScrollPosition();
     this.render();
+  }
+
+  onOpenStats(event) {
+    event.preventDefault();
+    this._statsApp ??= new CampaignStatsApp(this.archiveManager);
+    this._statsApp.render({ force: true });
   }
 
   async onToggleViewMode(event, target) {

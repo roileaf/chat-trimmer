@@ -1,0 +1,84 @@
+<div class="campaign-stats">
+    <div class="archive-header">
+        <h2>{{localize "CHATTRIMMER.Stats.Title"}}</h2>
+        <div class="archive-header-controls">
+            <select class="archive-select" name="scope" aria-label="{{localize 'CHATTRIMMER.Stats.Scope'}}">
+                {{#each scopeOptions}}
+                <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
+    <div class="stats-body">
+        {{#if hasData}}
+        <div class="stats-highlights">
+            <div class="stats-highlight">
+                <span class="stats-highlight-icon">🏆</span>
+                <span class="stats-highlight-label">{{localize "CHATTRIMMER.Stats.MostNat20"}}</span>
+                <strong>{{#if highlights.mostNat20}}{{highlights.mostNat20.name}} ({{highlights.mostNat20.value}}){{else}}—{{/if}}</strong>
+            </div>
+            <div class="stats-highlight">
+                <span class="stats-highlight-icon">💀</span>
+                <span class="stats-highlight-label">{{localize "CHATTRIMMER.Stats.MostNat1"}}</span>
+                <strong>{{#if highlights.mostNat1}}{{highlights.mostNat1.name}} ({{highlights.mostNat1.value}}){{else}}—{{/if}}</strong>
+            </div>
+            <div class="stats-highlight">
+                <span class="stats-highlight-icon">💥</span>
+                <span class="stats-highlight-label">{{localize "CHATTRIMMER.Stats.BiggestHit"}}</span>
+                <strong>{{#if highlights.biggestHit}}{{highlights.biggestHit.name}} ({{highlights.biggestHit.value}}){{else}}—{{/if}}</strong>
+            </div>
+        </div>
+
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>{{localize "CHATTRIMMER.Stats.Character"}}</th>
+                    <th>{{localize "CHATTRIMMER.Stats.Rolls"}}</th>
+                    <th>{{localize "CHATTRIMMER.Stats.Nat20"}}</th>
+                    <th>{{localize "CHATTRIMMER.Stats.Nat1"}}</th>
+                    <th>{{localize "CHATTRIMMER.Stats.CritSuccess"}}</th>
+                    <th>{{localize "CHATTRIMMER.Stats.CritFail"}}</th>
+                    <th>{{localize "CHATTRIMMER.Stats.Damage"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each rows}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td>{{this.rolls}}</td>
+                    <td>{{this.nat20}}</td>
+                    <td>{{this.nat1}}</td>
+                    <td>{{this.critSuccess}}</td>
+                    <td>{{this.critFail}}</td>
+                    <td>{{this.damage}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        {{#if showBars}}
+        <h3 class="stats-section-title">{{localize "CHATTRIMMER.Stats.RollsPerSession"}}</h3>
+        <div class="stats-bars">
+            {{#each sessionBars}}
+            <div class="stats-bar-row">
+                <span class="stats-bar-label">{{this.name}}{{#if this.partial}}*{{/if}}</span>
+                <span class="stats-bar-track"><span class="stats-bar-fill" style="width: {{this.pct}}%"></span></span>
+                <span class="stats-bar-value">{{this.rolls}}</span>
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        {{#if partial}}
+        <p class="stats-note">* {{localize "CHATTRIMMER.Stats.PartialNote"}}</p>
+        {{/if}}
+        {{else}}
+        <p class="stats-empty">{{localize "CHATTRIMMER.Stats.Empty"}}</p>
+        {{/if}}
+    </div>
+
+    <div class="stats-footer">
+        {{localize "CHATTRIMMER.Stats.Footer"}}: {{footer.archived}} · {{footer.compressionRatio}}%
+    </div>
+</div>

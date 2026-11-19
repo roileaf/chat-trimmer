@@ -4,6 +4,7 @@ import { KeywordExtractor } from "./utils/keyword-extractor.js";
 import { MessageParser } from "./utils/message-parser.js";
 import { deleteInBatches } from "./utils/chat-cleanup.js";
 import { createProgress } from "./utils/progress.js";
+import { computeActorStats } from "./utils/actor-stats.js";
 
 /**
  * Main chat trimmer class
@@ -177,6 +178,7 @@ export class ChatTrimmer {
 
       // 5. Generate statistics
       const stats = this.calculateStatistics(entries, detected);
+      stats.byActor = computeActorStats(messages);
       console.log("Chat Trimmer | Statistics:", stats);
 
       // 6. Create archive document

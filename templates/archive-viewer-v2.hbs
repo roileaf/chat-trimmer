@@ -9,6 +9,9 @@
                 </option>
                 {{/each}}
             </select>
+            <button type="button" data-action="openStats" data-tooltip="{{localize 'CHATTRIMMER.Stats.Title'}}" aria-label="{{localize 'CHATTRIMMER.Stats.Title'}}">
+                <i class="fas fa-chart-column"></i>
+            </button>
             {{#if isGM}}
             <button type="button" data-action="editSessionNumber" data-tooltip="Edit Archived Session Number" aria-label="Edit Archived Session Number">
                 <i class="fas fa-edit"></i>

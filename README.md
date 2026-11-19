@@ -40,6 +40,10 @@ Enable **Message Lifetimes** in module settings to give each kind of message its
 - The first matching type applies, in the order above (a GM's spell card uses the GM lifetime).
 - Cleared messages go into the current session archive. Only messages posted after enabling are affected.
 
+## Campaign stats
+
+Click the chart button in the archive viewer to open **Campaign Stats**: per-character rolls, nat 20s, nat 1s, critical successes and failures, and damage dealt, for the whole campaign or a single session. Highlights show the most nat 20s, most nat 1s, and the biggest hit; the campaign view also shows rolls per session. Rolls by the GM or non-player actors are grouped into one **GM / NPCs** row. Stats are counted from the original dice when chat is trimmed, so they are exact from this version on; sessions archived earlier are marked partial. Players can open it unless **Hide archives from players** is on.
+
 ## Session controls and archive access
 
 - Right-click the Chat Trimmer button → **Set Current Session Number** to match your campaign's session count. This changes the label without starting a new session.
