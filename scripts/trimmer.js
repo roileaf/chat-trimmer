@@ -5,6 +5,7 @@ import { MessageParser } from "./utils/message-parser.js";
 import { deleteInBatches } from "./utils/chat-cleanup.js";
 import { createProgress } from "./utils/progress.js";
 import { computeActorStats } from "./utils/actor-stats.js";
+import { messageKeywords } from "./utils/message-keywords.js";
 import {
   findSkillClusters,
   formatClusterSummary,
@@ -623,7 +624,7 @@ export class ChatTrimmer {
           displaySummary: displayText,
           content: this.sanitizeContent(msg.content),
           rollData: rollData,
-          searchKeywords: MessageParser.extractKeywords(msg.content),
+          searchKeywords: this.messageKeywords(msg),
           originalMessageIds: [msg.id],
           isKeyEvent: this.isKeyEvent(msg, contentLower),
         });
@@ -655,9 +656,7 @@ export class ChatTrimmer {
           searchKeywords: [
             ...new Set([
               cluster.skill.toLowerCase(),
-              ...cluster.messages.flatMap((m) =>
-                MessageParser.extractKeywords(m.content),
-              ),
+              ...cluster.messages.flatMap((m) => this.messageKeywords(m)),
             ]),
           ],
           originalMessageIds: cluster.messages.map((m) => m.id),
@@ -700,9 +699,7 @@ export class ChatTrimmer {
           searchKeywords: [
             ...new Set([
               ...npcs.map((name) => name.toLowerCase()),
-              ...thread.messages.flatMap((m) =>
-                MessageParser.extractKeywords(m.content),
-              ),
+              ...thread.messages.flatMap((m) => this.messageKeywords(m)),
             ]),
           ],
           originalMessageIds: thread.messages.map((m) => m.id),
@@ -751,7 +748,7 @@ export class ChatTrimmer {
         displaySummary: displayText,
         content: this.sanitizeContent(msg.content),
         rollData: rollData,
-        searchKeywords: MessageParser.extractKeywords(msg.content),
+        searchKeywords: this.messageKeywords(msg),
         originalMessageIds: [msg.id],
         isKeyEvent: this.isKeyEvent(msg, contentLower),
       });
@@ -792,7 +789,7 @@ export class ChatTrimmer {
       displaySummary: displayText,
       content: this.sanitizeContent(msg.content),
       rollData: rollData,
-      searchKeywords: MessageParser.extractKeywords(msg.content),
+      searchKeywords: this.messageKeywords(msg),
       originalMessageIds: [msg.id],
       isKeyEvent: this.isKeyEvent(msg, contentLower),
     };
@@ -1170,6 +1167,17 @@ export class ChatTrimmer {
     else if (checkMatch) icon = "🎲"; // Check requests get dice icon
 
     return `${icon} ${preview}`;
+  }
+
+  /** Search keywords for a message, including its attack target if any. */
+  messageKeywords(msg) {
+    let targetName = null;
+    try {
+      targetName = this.extractTargetName(msg);
+    } catch {
+      // Target lookup is best effort.
+    }
+    return messageKeywords(msg, { targetName });
   }
 
   /**

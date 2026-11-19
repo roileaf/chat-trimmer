@@ -5,6 +5,7 @@
 import { MessageViewerDialog } from "./dialogs.js";
 import { CampaignStatsApp } from "./campaign-stats.js";
 import { collectNpcs, entryNpcs } from "../algorithms/dialogue-threads.js";
+import { matchesQuery, parseQuery } from "../utils/archive-search.js";
 import { MessageParser } from "../utils/message-parser.js";
 
 export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicationMixin(
@@ -17,6 +18,7 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
     this.currentFilter = "all";
     this.npcFilter = ""; // NPC name, or "" for all
     this.searchQuery = "";
+    this.searchAllSessions = false;
     this.expandedEntries = new Set();
     this.summaryCollapsed = false; // Track session summary collapsed state
     this.viewMode = "full"; // "summary" or "full"
@@ -190,6 +192,14 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
         }
       });
     }
+
+    this.element
+      .querySelector(".search-all-sessions")
+      ?.addEventListener("change", (e) => {
+        this.searchAllSessions = e.target.checked;
+        this.currentPage = 1;
+        this.render();
+      });
   }
 
   async _prepareContext(options) {
@@ -260,8 +270,12 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
     let entries = [];
     this.entryMap = new Map(); // O(1) lookup cache
 
+    // "All sessions" only applies while there is a search query
+    const searchingAll = Boolean(this.searchAllSessions && this.searchQuery);
     let targetArchives = [];
-    if (this.currentSession) {
+    if (searchingAll) {
+      targetArchives = allArchives;
+    } else if (this.currentSession) {
       targetArchives = sessionGroups.get(this.currentSession) || [];
     }
 
@@ -281,6 +295,9 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
           sessionNumber: sNum,
           archiveName: archive.name, // Track source archive
           archiveId: archive.id,
+          sessionLabel: searchingAll
+            ? archive.getFlag("chat-trimmer", "sessionName") || archive.name
+            : undefined,
         }));
         entries.push(...mappedEntries);
         mappedEntries.forEach((e) => this.entryMap.set(e.id, e));
@@ -341,12 +358,8 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
 
     // Apply search
     if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-      entries = entries.filter((e) => {
-        const searchText =
-          `${e.displaySummary} ${e.displayText} ${e.content}`.toLowerCase();
-        return searchText.includes(query);
-      });
+      const query = parseQuery(this.searchQuery);
+      entries = entries.filter((e) => matchesQuery(e, query));
       console.log(
         `Archive Viewer | After search '${this.searchQuery}': ${entries.length} entries`,
       );
@@ -525,7 +538,7 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
 
     // Generate session summary if viewing a specific session
     let sessionSummary = null;
-    if (this.currentSession && targetArchives.length > 0) {
+    if (!searchingAll && this.currentSession && targetArchives.length > 0) {
       // Use unfiltered entries for session summary so key events aren't affected by filters
       const entriesWithoutHeaders = unfilteredEntries.filter(
         (e) => !e.isHeader,
@@ -550,6 +563,8 @@ export class ArchiveViewerV2 extends foundry.applications.api.HandlebarsApplicat
       npcFilter: this.npcFilter,
       npcOptions,
       searchQuery: this.searchQuery,
+      searchAllSessions: this.searchAllSessions,
+      searchingAll,
       filteredEntries: paginatedEntries,
       totalFilteredEntries,
       totalEntries,

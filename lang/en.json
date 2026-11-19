@@ -102,6 +102,8 @@
   "CHATTRIMMER.ArchiveViewer.Session": "Session",
   "CHATTRIMMER.ArchiveViewer.Filter": "Filter",
   "CHATTRIMMER.ArchiveViewer.Search": "Search",
+  "CHATTRIMMER.ArchiveViewer.SearchHint": "Press Enter to search. All words must appear, in any order; put words in quotes for an exact phrase.",
+  "CHATTRIMMER.ArchiveViewer.AllSessions": "All sessions",
   "CHATTRIMMER.ArchiveViewer.NpcsMet": "NPCs met",
   "CHATTRIMMER.ArchiveViewer.NpcLines": "lines",
   "CHATTRIMMER.ArchiveViewer.NpcFilter": "NPC",

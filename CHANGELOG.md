@@ -12,9 +12,11 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
 - Skill Check Clustering: checks of the same skill rolled within 2 minutes of each other (for example, everyone rolling Perception) are archived as one entry such as "Perception ×4 — Valeros 25 ✓✓, Kyra 21 ✓, …", expandable to each roll. On by default; toggle in settings.
 - Dialogue Threads: runs of in-character speech and emotes (3+ lines, each within 5 minutes) are archived as one conversation entry listing the speakers, expandable to each line. Rolls break a thread; OOC chat does not. On by default.
 - NPC Tracking: session summaries list the NPCs met (lines spoken, first appearance), conversations are tagged and searchable by NPC, and the archive viewer has an NPC filter. NPCs are speakers whose actor has no player owner, or the GM speaking under a token alias.
+- Better archive search: matches speakers, NPCs, conversation and cluster lines, and keywords, not only the visible summary. All words must appear in any order; use quotes for an exact phrase. An All sessions checkbox searches the whole campaign and labels each result with its session.
 
 ### Changed
 
+- Keywords now capture whole proper names, spell/item/action names, attack targets, and scenes, and no longer include generic words such as "attack" or "find" that matched nearly every entry.
 - Trimming now removes messages 10 at a time with short pauses (like Clear Chat Log) instead of in one request, reducing stalls on large trims.
 
 ## [2.2.0] - 2026-11-18
@@ -280,20 +282,6 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
   - Helps identify text contrast issues and conflicting CSS rules
 
 ## [Unreleased]
-
-### Planned for Phase 2
-
-- Dialogue thread detection
-- Skill check clustering
-- Enhanced keyword extraction
-- Improved NPC tracking
-
-### Planned for Phase 3
-
-- Enhanced UI animations
-- Progress bars for long operations
-- Better mobile responsiveness
-- Archive statistics dashboard
 
 ### Planned for Phase 4
 

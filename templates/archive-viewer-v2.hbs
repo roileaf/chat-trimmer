@@ -149,7 +149,12 @@
                     placeholder="{{localize 'CHATTRIMMER.ArchiveViewer.Search'}}"
                     value="{{searchQuery}}"
                     name="search"
+                    data-tooltip="{{localize 'CHATTRIMMER.ArchiveViewer.SearchHint'}}"
                 />
+                <label class="search-all-label">
+                    <input type="checkbox" class="search-all-sessions" name="searchAllSessions" {{#if searchAllSessions}}checked{{/if}} />
+                    {{localize "CHATTRIMMER.ArchiveViewer.AllSessions"}}
+                </label>
             </div>
             {{/if}}
         </div>
@@ -164,6 +169,7 @@
                 <span class="entry-icon">{{this.icon}}</span>
                 <div class="entry-main">
                     <div class="entry-header-content">
+                        {{#if this.sessionLabel}}<span class="entry-session-label">{{this.sessionLabel}}</span>{{/if}}
                         {{#if this.speaker}}<div class="entry-speaker">{{this.speaker}}</div>{{/if}}
                         <span class="entry-summary">{{#if this.displaySummary}}{{removeDuplicateSpeaker this.displaySummary this.speaker}}{{else}}{{removeDuplicateSpeaker this.displayText this.speaker}}{{/if}}</span>
                     </div>

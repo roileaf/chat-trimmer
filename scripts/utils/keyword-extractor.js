@@ -1,3 +1,5 @@
+import { messageKeywords } from "./message-keywords.js";
+
 /**
  * Utility class for extracting keywords and creating search indices
  */
@@ -63,44 +65,8 @@ export class KeywordExtractor {
      * Extract keywords from text
      */
     static extractFromText(text) {
-        const keywords = new Set();
-        const lower = text.toLowerCase();
-
-        // Extract capitalized words (proper nouns)
-        const nouns = text.match(/\b[A-Z][a-z]+\b/g);
-        if (nouns) {
-            nouns.forEach((noun) => keywords.add(noun.toLowerCase()));
-        }
-
-        // Extract quest-related keywords
-        const questKeywords = [
-            "find",
-            "search",
-            "investigate",
-            "discover",
-            "locate",
-            "retrieve",
-            "deliver",
-        ];
-        questKeywords.forEach((kw) => {
-            if (lower.includes(kw)) keywords.add(kw);
-        });
-
-        // Extract combat keywords
-        const combatKeywords = [
-            "attack",
-            "damage",
-            "hit",
-            "miss",
-            "kill",
-            "defeat",
-            "victory",
-        ];
-        combatKeywords.forEach((kw) => {
-            if (lower.includes(kw)) keywords.add(kw);
-        });
-
-        return Array.from(keywords);
+        // Proper names only; generic game words matched nearly every entry.
+        return messageKeywords({ content: text });
     }
 
     /**

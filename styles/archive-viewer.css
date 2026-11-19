@@ -1949,3 +1949,23 @@
   color: var(--color-text-light-primary);
   border-top: 1px solid var(--color-border-dark-primary);
 }
+
+/* Archive search: all-sessions toggle and session label */
+.chat-archive-viewer .search-all-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--color-text-light-primary);
+}
+
+.chat-archive-viewer .entry-session-label {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  font-size: 10px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--color-text-light-primary);
+}

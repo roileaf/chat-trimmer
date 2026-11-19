@@ -54,6 +54,10 @@ When chat is trimmed, a run of in-character speech and emotes (at least 3 lines,
 
 NPCs are speakers whose actor has no player owner, or the GM speaking under a token alias. Session summaries list **NPCs met** with how many lines each spoke and when they first appeared, conversations are searchable by NPC name, and the archive viewer has an **NPC** filter.
 
+## Archive search
+
+Press Enter in the archive viewer search box to search. All words must appear, in any order; put words in quotes for an exact phrase ("the relic"). Search covers summaries, speakers, NPCs, the lines inside conversations and skill clusters, spell and item names, attack targets, and scenes. Tick **All sessions** to search the whole campaign; each result shows its session.
+
 ## Session controls and archive access
 
 - Right-click the Chat Trimmer button → **Set Current Session Number** to match your campaign's session count. This changes the label without starting a new session.
@@ -275,17 +279,12 @@ Each archive contains:
 
 ### Enhanced Compression
 
-- Dialogue thread detection and compression
-- Skill check clustering
 - Location tracking and scene changes
-- Advanced keyword extraction with NPC/location recognition
 
 ### User Experience Improvements
 
-- Progress indicators during trim operations
 - Archive comparison tools
 - Session timeline visualization
-- Statistics dashboard with charts
 
 ### Advanced Features
 
