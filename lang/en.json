@@ -69,6 +69,10 @@
   "CHATTRIMMER.Prompts.NewSessionContent": "Are you sure you want to end the current session and start a new one? This will begin a new session archive.",
 
   "CHATTRIMMER.Notifications.TrimmingStart": "Trimming chat, please wait...",
+  "CHATTRIMMER.Progress.Title": "Trimming chat",
+  "CHATTRIMMER.Progress.Analyzing": "Analyzing {total} messages…",
+  "CHATTRIMMER.Progress.Saving": "Saving archive…",
+  "CHATTRIMMER.Progress.Removing": "Removing messages {deleted}/{total}…",
   "CHATTRIMMER.Notifications.OriginalNotAvailable": "Original message is not available.",
   "CHATTRIMMER.Notifications.TrimmingComplete": "Archived {original} message(s)",
   "CHATTRIMMER.Notifications.TrimmingCompleteNoArchive": "Deleted {original} message(s) without archiving",

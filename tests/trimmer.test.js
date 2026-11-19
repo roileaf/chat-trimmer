@@ -46,3 +46,35 @@ describe("ChatTrimmer.isKeyEvent", () => {
     expect(trimmer.isKeyEvent(message)).toBe(false);
   });
 });
+
+describe("ChatTrimmer.trim progress", () => {
+  let bar;
+  beforeEach(() => {
+    bar = { update: jest.fn() };
+    ui.notifications.info = jest.fn(() => bar);
+    ChatMessage.deleteDocuments = jest.fn(async () => {});
+    game.settings.get = jest.fn(() => 0); // archiving off, keep 0
+  });
+
+  test("shows a progress bar and deletes in batches", async () => {
+    const messages = Array.from({ length: 12 }, (_, i) => ({ id: `m${i}` }));
+    const trimmer = new ChatTrimmer();
+    await trimmer.trim(messages, { ignoreKeep: true });
+
+    expect(ChatMessage.deleteDocuments).toHaveBeenCalledTimes(2);
+    expect(ui.notifications.info).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ progress: true }),
+    );
+    expect(bar.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({ pct: 1 }),
+    );
+  });
+
+  test("silent trims show no notification", async () => {
+    const trimmer = new ChatTrimmer();
+    await trimmer.trim([{ id: "a" }], { ignoreKeep: true, silent: true });
+    expect(ui.notifications.info).not.toHaveBeenCalled();
+    expect(ChatMessage.deleteDocuments).toHaveBeenCalledWith(["a"]);
+  });
+});

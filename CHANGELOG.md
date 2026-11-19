@@ -7,6 +7,11 @@ All notable changes to the Chat Trimmer & Summarizer module will be documented i
 ### Added
 
 - Message Lifetimes: give each message type (player OOC chat, IC speech, rolls, combat rolls, spell/ability cards, GM messages, whispers) its own lifetime in minutes. Expired messages are archived and removed. Time only counts while the world is running; player OOC chat defaults to 15 minutes, everything else is kept.
+- Progress bar for Trim All, new-session archiving, and auto-trim: shows analyzing, saving, and a live count while messages are removed.
+
+### Changed
+
+- Trimming now removes messages 10 at a time with short pauses (like Clear Chat Log) instead of in one request, reducing stalls on large trims.
 
 ## [2.2.0] - 2026-11-18
 

@@ -3,9 +3,24 @@ const DELETE_BATCH_SIZE = 10;
 const DELETE_PAUSE_MS = 100;
 
 /**
- * Bound each socket response's synchronous document callbacks on every client.
- * Keep core deletion hooks and chat animations; let them settle between batches.
+ * Delete documents in small batches with pauses, bounding each socket
+ * response's synchronous document callbacks on every client. Core deletion
+ * hooks and chat animations settle between batches.
+ * @param {{deleteDocuments: Function}} documentClass
+ * @param {string[]} ids
+ * @param {{onProgress?: (deleted: number, total: number) => void}} [options]
  */
+export async function deleteInBatches(documentClass, ids, { onProgress } = {}) {
+  for (let offset = 0; offset < ids.length; offset += DELETE_BATCH_SIZE) {
+    const batch = ids.slice(offset, offset + DELETE_BATCH_SIZE);
+    await documentClass.deleteDocuments(batch);
+    onProgress?.(offset + batch.length, ids.length);
+    if (offset + DELETE_BATCH_SIZE < ids.length) {
+      await new Promise((resolve) => setTimeout(resolve, DELETE_PAUSE_MS));
+    }
+  }
+}
+
 async function clearMessages(collection) {
   // Snapshot after confirmation. Messages posted during cleanup survive.
   const ids = [
@@ -14,14 +29,7 @@ async function clearMessages(collection) {
       ...(collection.invalidDocumentIds ?? []),
     ]),
   ];
-  for (let offset = 0; offset < ids.length; offset += DELETE_BATCH_SIZE) {
-    await collection.documentClass.deleteDocuments(
-      ids.slice(offset, offset + DELETE_BATCH_SIZE),
-    );
-    if (offset + DELETE_BATCH_SIZE < ids.length) {
-      await new Promise((resolve) => setTimeout(resolve, DELETE_PAUSE_MS));
-    }
-  }
+  await deleteInBatches(collection.documentClass, ids);
   if (!collection.size) {
     for (const button of document.querySelectorAll(".jump-to-bottom")) {
       button.hidden = true;

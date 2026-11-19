@@ -2,6 +2,8 @@ import { CombatDetector } from "./algorithms/combat-detector.js";
 import { ArchiveManager } from "./archive-manager.js";
 import { KeywordExtractor } from "./utils/keyword-extractor.js";
 import { MessageParser } from "./utils/message-parser.js";
+import { deleteInBatches } from "./utils/chat-cleanup.js";
+import { createProgress } from "./utils/progress.js";
 
 /**
  * Main chat trimmer class
@@ -71,6 +73,27 @@ export class ChatTrimmer {
         return null;
       }
 
+      const progress = createProgress(
+        game.i18n.localize("CHATTRIMMER.Progress.Title"),
+        { enabled: !options.silent },
+      );
+      const total = messages.length;
+      const removeMessages = (start) =>
+        deleteInBatches(
+          ChatMessage,
+          messages.map((m) => m.id),
+          {
+            onProgress: (deleted) =>
+              progress.update(
+                start + (0.95 - start) * (deleted / total),
+                game.i18n.format("CHATTRIMMER.Progress.Removing", {
+                  deleted,
+                  total,
+                }),
+              ),
+          },
+        );
+
       // Check if archiving is enabled
       const enableArchiving = game.settings.get(
         "chat-trimmer",
@@ -83,18 +106,13 @@ export class ChatTrimmer {
         console.log(
           "Chat Trimmer | Archiving disabled - deleting messages without archiving",
         );
-        const messageIds = messages.map((m) => m.id);
-        await ChatMessage.deleteDocuments(messageIds);
-
-        if (!options.silent)
-          ui.notifications.info(
-            game.i18n.format(
-              "CHATTRIMMER.Notifications.TrimmingCompleteNoArchive",
-              {
-                original: messages.length,
-              },
-            ),
-          );
+        await removeMessages(0);
+        progress.done(
+          game.i18n.format(
+            "CHATTRIMMER.Notifications.TrimmingCompleteNoArchive",
+            { original: total },
+          ),
+        );
 
         return {
           archive: null,
@@ -104,6 +122,10 @@ export class ChatTrimmer {
       }
 
       // 1. Classify messages by type
+      progress.update(
+        0.1,
+        game.i18n.format("CHATTRIMMER.Progress.Analyzing", { total }),
+      );
       const classified = this.classifyMessages(messages);
       console.log("Chat Trimmer | Classification results:", {
         combat: classified.combat.length,
@@ -158,6 +180,7 @@ export class ChatTrimmer {
       console.log("Chat Trimmer | Statistics:", stats);
 
       // 6. Create archive document
+      progress.update(0.5, game.i18n.localize("CHATTRIMMER.Progress.Saving"));
       console.log("Chat Trimmer | Creating archive document...");
       const archive = await this.archiveManager.create({
         entries,
@@ -172,8 +195,7 @@ export class ChatTrimmer {
 
       // 7. Delete original messages (unless keeping originals)
       if (!options.keepOriginals) {
-        const messageIds = messages.map((m) => m.id);
-        await ChatMessage.deleteDocuments(messageIds);
+        await removeMessages(0.6);
       }
 
       // 8. Show completion notification
@@ -181,12 +203,11 @@ export class ChatTrimmer {
         ((messages.length - entries.length) / messages.length) * 100,
       );
 
-      if (!options.silent)
-        ui.notifications.info(
-          game.i18n.format("CHATTRIMMER.Notifications.TrimmingComplete", {
-            original: messages.length,
-          }),
-        );
+      progress.done(
+        game.i18n.format("CHATTRIMMER.Notifications.TrimmingComplete", {
+          original: total,
+        }),
+      );
 
       return {
         archive,
