@@ -21,6 +21,7 @@ import {
 } from "./utils/message-lifetimes.js";
 import {
   hasActiveCombatEncounter,
+  runAutoTrim,
   shouldSkipAutoTrim,
 } from "./utils/auto-trim.js";
 
@@ -608,8 +609,7 @@ async function performAutoTrim() {
   console.log("Chat Trimmer | Performing auto-trim");
 
   try {
-    await chatTrimmer.trim();
-    await game.settings.set("chat-trimmer", "lastTrimTime", Date.now());
+    await runAutoTrim(chatTrimmer);
   } catch (error) {
     console.error("Chat Trimmer | Auto-trim failed:", error);
   }

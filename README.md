@@ -10,7 +10,7 @@
 
 While Chat Trimmer is enabled, Foundry's trash-can **Clear Chat Log** button deletes messages in batches of 10, with 100 ms pauses between batches. This spreads deletion hooks and chat animations over smaller requests to reduce long stalls. Large logs may take longer to finish clearing. The normal confirmation and document permissions apply; messages posted after cleanup starts remain in chat. Clear Chat Log still deletes messages without archiving them.
 
-Trim All, new-session archiving, and auto-trim show a progress bar (analyzing, saving archive, then a live count of removed messages) and remove messages in the same 10-per-batch way.
+Trim All and new-session archiving show a progress bar (analyzing, saving archive, then a live count of removed messages). All trims remove messages in the same 10-per-batch way. Automatic trims (auto-trim, combat turn cleanup, and message lifetimes) run silently, without a notification.
 
 ## Combat turn cleanup
 

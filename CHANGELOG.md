@@ -2,6 +2,12 @@
 
 All notable changes to the Chat Trimmer & Summarizer module will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- Auto-trim now runs silently, like combat turn cleanup and message lifetimes. In message-count mode it could fire every few messages during busy combats, showing a distracting progress notification each time. Trim All and new-session archiving still show their progress bar.
+
 ## [2.3.1] - 2026-11-22
 
 ### Fixed
