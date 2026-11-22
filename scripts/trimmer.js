@@ -96,6 +96,8 @@ export class ChatTrimmer {
           ChatMessage,
           messages.map((m) => m.id),
           {
+            // Skip messages deleted elsewhere since the list was taken
+            exists: (id) => game.messages?.has?.(id) ?? true,
             onProgress: (deleted) =>
               progress.update(
                 start + (0.95 - start) * (deleted / total),

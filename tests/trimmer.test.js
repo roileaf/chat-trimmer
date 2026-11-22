@@ -183,3 +183,30 @@ describe("ChatTrimmer.createArchiveEntries conversations", () => {
     expect(entries[0].searchKeywords).toContain("mayor hemlock");
   });
 });
+
+describe("ChatTrimmer.trim when a message was deleted elsewhere", () => {
+  test("finishes and removes the remaining messages", async () => {
+    ui.notifications.info = jest.fn(() => ({ update: jest.fn() }));
+    ui.notifications.error = jest.fn();
+    game.settings.get = jest.fn(() => 0); // archiving off, keep 0
+    const alive = new Set(["a", "b", "c"]);
+    game.messages = {
+      contents: [],
+      size: 0,
+      has: (id) => alive.has(id),
+    };
+    ChatMessage.deleteDocuments = jest.fn(async (ids) => {
+      const missing = ids.find((id) => !alive.has(id));
+      if (missing) throw new Error(`ChatMessage "${missing}" does not exist!`);
+      ids.forEach((id) => alive.delete(id));
+    });
+    const messages = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    alive.delete("b"); // removed by another module after the snapshot
+
+    const result = await new ChatTrimmer().trim(messages, { ignoreKeep: true });
+
+    expect(ui.notifications.error).not.toHaveBeenCalled();
+    expect(result).not.toBeNull();
+    expect(alive.size).toBe(0);
+  });
+});

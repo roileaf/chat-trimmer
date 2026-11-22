@@ -75,3 +75,70 @@ describe("createProgress", () => {
     );
   });
 });
+
+describe("deleteInBatches with messages removed elsewhere", () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  const serverWith = (ids) => {
+    const alive = new Set(ids);
+    return {
+      alive,
+      deleteDocuments: jest.fn(async (batch) => {
+        const missing = batch.find((id) => !alive.has(id));
+        if (missing)
+          throw new Error(`ChatMessage "${missing}" does not exist!`);
+        batch.forEach((id) => alive.delete(id));
+      }),
+    };
+  };
+
+  test("skips ids that no longer exist before each batch", async () => {
+    const ids = Array.from({ length: 15 }, (_, i) => `m${i}`);
+    const server = serverWith(ids);
+    server.alive.delete("m12"); // deleted by someone else after the snapshot
+    const onProgress = jest.fn();
+
+    const done = deleteInBatches(server, ids, {
+      exists: (id) => server.alive.has(id),
+      onProgress,
+    });
+    await jest.runAllTimersAsync();
+    await done;
+
+    expect(server.alive.size).toBe(0);
+    expect(onProgress).toHaveBeenLastCalledWith(15, 15);
+  });
+
+  test("retries once without ids removed during the request", async () => {
+    const ids = ["a", "b", "c"];
+    const server = serverWith(ids);
+    const real = server.deleteDocuments;
+    server.deleteDocuments = jest.fn(async (batch) => {
+      if (server.deleteDocuments.mock.calls.length === 1)
+        server.alive.delete("b");
+      return real(batch);
+    });
+
+    const done = deleteInBatches(server, ids, {
+      exists: (id) => server.alive.has(id),
+    });
+    await jest.runAllTimersAsync();
+    await done;
+
+    expect(server.deleteDocuments).toHaveBeenCalledTimes(2);
+    expect(server.deleteDocuments.mock.calls[1][0]).toEqual(["a", "c"]);
+    expect(server.alive.size).toBe(0);
+  });
+
+  test("other errors still propagate", async () => {
+    const server = {
+      deleteDocuments: jest.fn(async () => {
+        throw new Error("permission denied");
+      }),
+    };
+    await expect(
+      deleteInBatches(server, ["a"], { exists: () => true }),
+    ).rejects.toThrow("permission denied");
+  });
+});

@@ -2,6 +2,12 @@
 
 All notable changes to the Chat Trimmer & Summarizer module will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Trimming no longer fails with "ChatMessage ... does not exist" when a message is deleted elsewhere (another module, a user, or Clear Chat Log) while the trim runs. Messages already gone are skipped, and the rest are still removed, so the trim no longer stops partway and leaves already-archived messages in chat.
+
 ## [2.3.0] - 2026-11-19
 
 ### Added
